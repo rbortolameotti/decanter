@@ -3,6 +3,7 @@ from brothon import bro_log_reader
 import pandas as pd
 
 class BroParser:
+    """ Parse Bro log files """ 
     
     def __init__(self):
         pass
