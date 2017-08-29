@@ -6,6 +6,9 @@ import csv
 
 
 class Fingerprint():
+    """
+    Object that describes a fingerprint of DECANTeR.
+    """
     
     def __init__(self, label, ua, hosts, ip_dsts, const_head, lang, avg_size, outg_info, method_name, is_malicious=0):
         if label == "Background":
@@ -75,7 +78,10 @@ class Fingerprint():
 
 
 class FingerprintGenerator():
-    
+    """
+    Object that is responsible of generating a fingerprint.
+    """
+
     def __init__(self):
         self.counter_req = 0
         pass
@@ -125,7 +131,7 @@ class FingerprintGenerator():
         language = []
         outgoing_info = 0
         
-        # TODO added for evasion analysis
+        # Used for evasion analysis
         is_malicious = '1' if '1' in [m.is_malicious for m in method_cluster] else '0'
         
         # Return None if there are no request to analyze. (i.e., fingerprint does not exist)
@@ -308,7 +314,9 @@ class FingerprintGenerator():
 
 
 class FingerprintManager():
-        
+    """
+    Object used to loads/load fingerprints from/to files or to store them temporarily in a dictionary.
+    """
     def __init__(self):
         self.hosts_fingerprints = {}
         
