@@ -3,6 +3,9 @@ import glob
 from fingerprint import FingerprintManager
 
 class DetectionModule():
+    """
+    This class is responsible to compare fingerprints and identify potentially malicious requests.
+    """
     
     def __init__(self):
         self.background_threshold = 2.5
@@ -97,8 +100,24 @@ class DetectionModule():
         return result
                     
                 
-    # Compute the similarity between two user-agent strings. The lower the values, the more similar the strings are.
-    def _ua_distance(self, new_ua, old_ua): # TODO
+    def _ua_distance(self, new_ua, old_ua): 
+        """
+        This method  computes the similarity between two user-agent strings. 
+        The lower the values, the more similar the strings are.
+
+            Parameters
+            ---------------
+            new_ua : string
+                The new User-Agent we want to compare.
+
+            old_ua : string
+                The old User-Agent that is (presumably) changed.
+
+            Returns
+            ---------------
+            dist : float
+                The similarity between new_ua and old_ua.
+        """
         dist = float(editdistance.eval(new_ua, old_ua))
         if len(new_ua) > len(old_ua):
             dist /= len(new_ua)
@@ -107,8 +126,24 @@ class DetectionModule():
         return dist
     
     
-    # Verifiy if the features (other than UA) are still similar between the two fingerprints.
-    def _similar_alert(self, alert, fingerprint): # TODO
+    def _similar_alert(self, alert, fingerprint): 
+        """
+        This methods verifies that the features, other than the User-Agent, are (still) similar between two fingerprints.
+
+        The goal of this method is to verify how much similar is a potential alert to an existing fingerprint.
+
+            Parameters
+            --------------
+            alert : Fingerprint
+                Fingerprint that is considered an alert.
+            fingerprint : Fingerprint
+                Fingerprint that we want to compare with the alert.
+
+            Returns
+            --------------
+            similar : boolean
+                True if the alert and the fingerprint are indeed similar, False otherwise.
+        """
         similar = False
         if alert.label == fingerprint.label:
             score = 1.0
@@ -129,10 +164,22 @@ class DetectionModule():
         return similar
     
     
-    # Verify if the fingerprint contains string of known browsers. If it does, than it is likely to be a malicious
-    # connection trying to communicate with a browser-like user agent. This check is done after the "outgoing threshold
-    # check.
-    def _fake_browser(self, user_agent_string): # TODO
+    def _fake_browser(self, user_agent_string): 
+        """
+        This methods verifies if the fingerprint contains a string of a known browser.
+        If it does, than it is likely to be a malicious connection trying to communicate with a browser-like User-Agent.
+
+        This check is performed after the "outgoing treshold" check.
+
+            Parameter
+            -------------
+            user_agent_string : string
+                The User-Agent of a fingerprint that we want to verify
+
+            Returns
+            -------------
+            True if it matches a known browser fingerprint, False otherwise.
+        """
         for s in self.known_browsers_str:
             if s in user_agent_string[0]:
                 return True
@@ -176,8 +223,20 @@ class DetectionModule():
                 return False
     
     
-    # Compute Background-type fingerprint similarity based on their core features.
     def _background_similarity(self, new_f1, old_f2):
+        """
+        This method computes the similarity between two Background-type fingerprints based on their core features.
+
+            Parameters
+            --------------
+            new_f1 : (Background) Fingerprint
+            old_f2 : (Background) Fingerprint
+
+            Returns
+            --------------
+            score : float
+                The similarity score between two Background-type fingerprints
+        """
         score = 0.0
         score += self._host_check(new_f1.hosts, old_f2.hosts)
         score += self._avg_size_check(new_f1.avg_size, old_f2.avg_size)
@@ -186,16 +245,40 @@ class DetectionModule():
         return score
     
     
-    # Compute Browser-type fingerprint similarity based on their core features.
     def _browser_similarity(self, new_f1, old_f2):
+        """
+        This method computes the similarity between two Browser-type fingerprints based on their core features.
+
+            Parameters
+            --------------
+            new_f1 : (Browser) Fingerprint
+            old_f2 : (Browser) Fingerprint
+
+            Returns
+            --------------
+            score : float
+                The similarity score between two Browser-type fingerprints
+        """
         score = 0.0
         score += self._ua_check(new_f1.user_agent, old_f2.user_agent)
         score += self._language_check(new_f1.language, old_f2.language)
         return score
     
     
-    # Check if the set of hosts of the old fingerprint is a superset of the new list of hosts.
     def _host_check(self, new_host_list, old_host2_list):
+        """
+        This method checks if the set of hosts of the old fingerprint is a superset of the new fingerprint's list of hosts.
+
+            Parameters
+            --------------
+            new_host_list: list of string
+            old_host2_list : list of string
+
+            Returns
+            -------------
+            result : float
+                The result of this similarity function between the HTTP host features.
+        """
         result = 0.0
         for host,count in new_host_list:
             if host not in [o[0] for o in old_host2_list]:
@@ -204,9 +287,21 @@ class DetectionModule():
         return result
     
     
-    # Check if the average request size of the new fingerprint falls within a certain range 
-    # from the average size of the old fingerpring 
     def _avg_size_check(self, new_avg, old_avg):
+        """
+        This method checks if the average request size of the new fingerprint falls within a certain range 
+        from the average size of the old fingerprint.
+
+            Parameters
+            --------------
+            new_avg: int
+            old_avg: int
+
+            Returns
+            --------------
+            result : float
+                The result of this similaritfy function based on the average size of HTTP requests
+        """
         avg_percentage_error = 30
         result = 0.0
         error_margin = (float(old_avg)/ 100) * avg_percentage_error
@@ -221,9 +316,21 @@ class DetectionModule():
             return result
         
         
-    # Check if the set of constant headers of the new fingerprint fully or partially match with the
-    # list of constant headers of the old fingerprint.
     def _header_check(self, new_const_headers, old_const_headers):
+        """
+        This method checks if the set of constant headers of the new fingerprint fully or partially match with the
+        list of constant headers of the old fingerprint.
+
+            Parameters
+            ---------------
+            new_const_headers: list of string
+            old_const_headers: list of string
+
+            Returns
+            ---------------
+            result: float
+                The result of this similarity function based on the constant headers present in HTTP requests.
+        """
         matches = 0
         result = 0.0
         for header in new_const_headers:
@@ -239,8 +346,20 @@ class DetectionModule():
             return result
         
     
-    # Check if the two user-agent values match.
     def _ua_check(self, new_ua, old_ua):
+        """
+        This methods verifies that two User-Agents are matching.
+
+            Parameters
+            -------------
+            new_ua: string
+            old_ua: string
+
+            Returns
+            -------------
+            result: float
+                Returns 1.0 if there is a match, 0.0 otherwise.
+        """
         result = 0.0
         if new_ua == old_ua:
             result += 1.0
@@ -249,8 +368,20 @@ class DetectionModule():
             return result
         
     
-    # Check if the two language values match.
     def _language_check(self, new_lang, old_lang):
+        """
+        This methods verifies that two Accept-Language values are matching. (Same check as _ua_check() )
+
+            Parameters
+            -------------
+            new_lang: string
+            old_lang: string
+
+            Returns
+            -------------
+            result: float
+                Returns 1.0 if there is a match, 0.0 otherwise.
+        """
         result = 0.0
         if new_lang == old_lang:
             result += 1.0
@@ -268,16 +399,22 @@ class OfflineDetector:
         self.detector = DetectionModule()
         
         
-    def _load_from_csv(self):
-        for f in self.files:
-            if "training" in f:
-                self.training_manager.read_from_file(f)
-                print "" + f + " has been loaded for training."
-            else:
-                self.testing_manager.read_from_file(f)
-                print "" + f + " has been loaded for testing."
+    #def _load_from_csv(self):
+    #    """
+    #    This method loads fingerprints from a .csv file.
+    #    """
+    #    for f in self.files:
+    #        if "training" in f:
+    #            self.training_manager.read_from_file(f)
+    #            print "" + f + " has been loaded for training."
+    #        else:
+    #            self.testing_manager.read_from_file(f)
+    #            print "" + f + " has been loaded for testing."
                 
     def _load_from_csv_2(self):
+        """
+        This method loads fingerprints from a .csv file, but only those flagged for training"
+        """
         for f in self.files:
             if "training" in f:
                 self.training_manager.read_from_file(f)
@@ -287,6 +424,14 @@ class OfflineDetector:
             #    print "" + f + " has been loaded for testing."
                 
     def run_detection_2(self):
+        """
+        This method runs the offline detection.
+
+        Fingerprints were previously dumped into csv files. In the offline analysis are loaded
+        from the csv files, and then compared.
+
+        Training data is first loaded. The each testing file is analyzed.
+        """
         alerts = []
         benign = []
         self._load_from_csv_2()
@@ -318,37 +463,32 @@ class OfflineDetector:
         print """{}/{} files detected.""".format(total_detected, total_files)
         return alerts, benign
     
-    def run_detection(self):
-        alerts = []
-        benign = []
-        self._load_from_csv()
-        all_training_fingerprints = []
+    #def run_detection(self):
+    #    alerts = []
+    #    benign = []
+    #    self._load_from_csv()
+    #    all_training_fingerprints = []
         
-        total_files    = 0
-        total_detected = 0
-        for h, fingerprints in self.training_manager.hosts_fingerprints.iteritems():
-            for f in fingerprints:
-                all_training_fingerprints.append(f)
-        for host,test_fingerprints in self.testing_manager.hosts_fingerprints.iteritems():
-            total_files += 1
-            detected = False
-            for fingerprint in test_fingerprints:
-                if self.detector.detection(all_training_fingerprints, fingerprint):
-                    if not detected:
-                        total_detected += 1
-                        detected = True
-                    alerts.append(fingerprint)
-                else:
-                    benign.append(fingerprint)
-            if not detected:
-                print host
-        
-        print """{}/{} files detected.""".format(total_detected, total_files)
-        #print "Benign: " , len(benign)
-        #print "Alerts: " , len(alerts)
-        #for x in alerts:
-        #    print x
-            
-        # TODO added for testing purposes
-        return alerts, benign
+    #    total_files    = 0
+    #    total_detected = 0
+    #    for h, fingerprints in self.training_manager.hosts_fingerprints.iteritems():
+    #        for f in fingerprints:
+    #            all_training_fingerprints.append(f)
+    #    for host,test_fingerprints in self.testing_manager.hosts_fingerprints.iteritems():
+    #        total_files += 1
+    #        detected = False
+    #        for fingerprint in test_fingerprints:
+    #            if self.detector.detection(all_training_fingerprints, fingerprint):
+    #                if not detected:
+    #                    total_detected += 1
+    #                    detected = True
+    #                alerts.append(fingerprint)
+    #            else:
+    #                benign.append(fingerprint)
+    #        if not detected:
+    #            print host
+    #    
+    #    print """{}/{} files detected.""".format(total_detected, total_files)
+    #       
+    #    return alerts, benign
 
