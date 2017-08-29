@@ -3,12 +3,13 @@
 
 from   collections import Counter
 from   scipy.stats import entropy
+from   socket      import inet_ntoa
 import datetime
 import urlparse
 
 class DumontRequest:
     
-    def __init__(self, timestamp, req):
+    def __init__(self, timestamp, req, ip=None):
         """ A DumontRequest instance requires a timestamp
             and the HTTP request it calculates the length
             (l1-l5), structural (s1-s4), entropy (e1-e4),
@@ -25,6 +26,7 @@ class DumontRequest:
             """
         self.timestamp = timestamp
         self.req = req
+        self.ip = ip
         
         # Set length features of request
         self.l1 = self.__l1__(self.req)
@@ -84,7 +86,10 @@ class DumontRequest:
                 dpkt request retrieved from .pcap file.
             
             """
-        return len(req)
+        try:
+            return len(req)
+        except UnicodeEncodeError:
+            return len(req.pack_hdr()) + len(req.body) + 2
 
     def __l2__(self, req):
         """ Extract total length of URI 
@@ -225,7 +230,12 @@ class DumontRequest:
             
             """
         # Transform request into byte array
-        reqBytes = [ord(c) for c in str(req)]
+        try:
+            reqBytes = [ord(c) for c in str(req)]
+        except UnicodeEncodeError:
+            reqBytes = [ord(c) for c in req.pack_hdr() + u'\r\n']
+            reqBytes.extend([ord(c) for c in req.body])
+            
         # Compute entropy from bytes
         return self.__entropyFromList__(reqBytes)
 
@@ -239,7 +249,11 @@ class DumontRequest:
             
             """
         # Transform request into byte array
-        reqBytes = [ord(c) for c in str(req)]
+        try:
+            reqBytes = [ord(c) for c in str(req)]
+        except UnicodeEncodeError:
+            reqBytes = [ord(c) for c in req.pack_hdr() + u'\r\n']
+            reqBytes.extend([ord(c) for c in req.body])
         # Combine two bites into 16 bit number
         entr16 = [reqBytes[i]<<8 + reqBytes[i+1] for i in range(0, len(reqBytes)-1, 2)]
         # Compute entropy from bytes
@@ -255,7 +269,11 @@ class DumontRequest:
             
             """
         # Transform request into byte array
-        reqBytes = [ord(c) for c in str(req)]
+        try:
+            reqBytes = [ord(c) for c in str(req)]
+        except UnicodeEncodeError:
+            reqBytes = [ord(c) for c in req.pack_hdr() + u'\r\n']
+            reqBytes.extend([ord(c) for c in req.body])
         # Combine two bites into 16 bit number
         entr24 = [reqBytes[i]<<16 + reqBytes[i+1]<<8 + reqBytes[i+2] for i in range(0, len(reqBytes)-2, 3)]
         # Compute entropy from bytes
@@ -271,7 +289,11 @@ class DumontRequest:
             
             """
         # Transform request into byte array
-        reqBytes = [ord(c) for c in str(req)]
+        try:
+            reqBytes = [ord(c) for c in str(req)]
+        except UnicodeEncodeError:
+            reqBytes = [ord(c) for c in req.pack_hdr() + u'\r\n']
+            reqBytes.extend([ord(c) for c in req.body])
         # Combine two bites into 16 bit number
         entr32 = [reqBytes[i]<<24 + reqBytes[i+1]<<16 + reqBytes[i+2]<<8 + reqBytes[i+3] for i in range(0, len(reqBytes)-3, 4)]
         # Compute entropy from bytes
@@ -359,3 +381,13 @@ DUMONT request at time {}:
         t3 = {}
         t4 = {}
 """.format(self.timestamp, self.l1, self.l2, self.l3, self.l4, self.l5, self.s1, self.s2, self.s3, self.s4, self.e1, self.e2, self.e3, self.e4, self.t1, self.t2, self.t3, self.t4)
+
+    def alert(self):
+        return """Alert:
+    Method: {}
+    User-Agent: {}
+    Host: {}
+    Destination IP: {}
+    Constant Headers: {}
+    Request size: {}
+    Outgoing Info (deprecated): {}""".format(self.req.method, self.req.headers.get('user-agent', '-'), self.req.headers.get('host', '-'), '-' if self.ip == None else inet_ntoa(self.ip.dst), '[' + ', '.join(self.req.headers.keys()) + ']', self.l1, self.l1)

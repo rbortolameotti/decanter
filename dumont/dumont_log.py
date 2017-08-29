@@ -392,18 +392,13 @@ DUMONT request at time {}:
         t3 = {}
         t4 = {}
 """.format(self.timestamp, self.l1, self.l2, self.l3, self.l4, self.l5, self.s1, self.s2, self.s3, self.s4, self.e1, self.e2, self.e3, self.e4, self.t1, self.t2, self.t3, self.t4)
-        
-#        return  """
-#        
-#Method          : {}
-#User-Agent      : {}
-#Host            : {}
-#Destination IP  : {}
-#Constant Headers: {}
-#Size            : {}
-#                """.format(self.log['method'],\
-#                           self.log['header_values'].get('user-agent', '-'),\
-#                           self.log['header_values'].get('host', '-'),\
-#                           self.log['id.resp_h'],\
-#                           '-',\
-#                           self.l1)
+
+    def alert(self):
+        return """Alert:
+    Method: {}
+    User-Agent: {}
+    Host: {}
+    Destination IP: {}
+    Constant Headers: {}
+    Request size: {}
+    Outgoing Info (deprecated): {}""".format(self.log['method'], self.log['header_values'].get('user-agent', '-'), self.log['header_values'].get('host', '-'), self.log['id.resp_h'], '[' + ', '.join(self.log['header_values'].keys()) + ']', self.l1, self.l1)
