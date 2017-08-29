@@ -1,45 +1,43 @@
 from detection import DetectionModule
 
 class EvaluationUtils:
+    """
+    This class manages the evaluation output of the performance of DECANTeR.
+    """
     def __init__(self, alerts, benign):
         self.alerts = alerts
         self.benign = benign
         self.unique_fing = self._unique_fingerprints()
     
-    # TODO : Add the detection performance according to the requests numbers and not fingerprints.!! TODOOOO!
-    def detection_performance(self):
-        tp = 0
-        tn = 0
-        fp = 0
-        fn = 0
-        
-        for a in self.alerts:
-            if int(a.is_malicious) == 1:
-                tp += 1
-            else:
-                fp += 1
-        
-        for b in self.benign:
-            if int(b.is_malicious) == 1:
-                fn += 1
-            else:
-                tn += 1
-                
-        print """
-            *************************************
-                    Detection Performance 
-            *************************************
-                Malicious              Benign
-            -------------------     -------------------
-            True positives:  {}     True negatives:  {}
-            False negatives: {}     False positives: {}
-        """.format(tp, tn, fn, fp)
-        
-        return tp, fn, tn, fp
     
-    
-        # TODO : Add the detection performance according to the requests numbers and not fingerprints.!! TODOOOO!
     def detection_performance_2(self):
+        """
+        This method evaluates the true positives (tp), false positives (fp), true negatives (tn), and false negatives (fn).
+
+        There are two modes of evaluation: a) without retraining and b) with retraining.
+
+        a) Without retraining: the system never updates. Whenever a fingerprint is triggered as fp, the system is NOT updated.
+           Everytime the same fingerprint appears in the traffic will always triggered. E.g., when a new software is installed and starts
+           communicating raising an alert, the alert will be repeated also for the next communication.
+
+        b) With retraining: the system always updates. Whenever a fingerprint is triggered as fp, we assume an operator "trains" they system
+           adding the new fingerprint to the set of known fingerprints. E.g., when a new software is installed and starts communicating
+           raising an alert, the alert will NOT be appear in the future communications, because is known to be "trusted".
+
+        This method outputs the classificatoin results for number of fingerprints and requests. DECANTeR works based on fingerprints, which is
+        the real representation of its performance. However, in order to compare it with DUMONT, we have added an analysis also per requests, which 
+        works as follows:
+        - The number of fp/tp/fn/tn is the amount of requests contained in the fingerprint classified as fp/tp/fn/tn.
+
+        E.g., If a fingerprint is classified as tn and it represents a cluster containing 10 requests. We add 10 to the number of tn.
+
+        There are four outputs classification results (tp, fp, tn, fn):
+        1) Output of fingerprints WITHOUT retraining
+        2) Output of fingerprints WITH retraining
+        3) Output of HTTP requests WITHOUT retraining
+        4) Output of HTTP requests WITH retraining
+
+        """
         tp = []
         tn = []
         fp = []
