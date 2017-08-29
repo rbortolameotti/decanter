@@ -56,7 +56,7 @@ def parsePCAP(filename):
             more_fragments = bool(ip.off & dpkt.ip.IP_MF)
             fragment_offset = ip.off & dpkt.ip.IP_OFFMASK
 
-            DumontRequests.append(DumontRequest(timestamp, request))
+            DumontRequests.append(DumontRequest(timestamp, request, ip))
     
     return aggregateTemporalFeatures(DumontRequests)
     
