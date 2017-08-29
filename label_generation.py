@@ -5,6 +5,9 @@ from urlparse import urlparse
 
 
 class ReferrerGraph:
+    """
+    Object representing the ReferrerGraph.
+    """
     
     def __init__(self, cluster, subdomains=2, time_threshold=600):
         """ Create a Referrer Graph from given filename
@@ -308,6 +311,9 @@ class ReferrerGraph:
 
 
 class LabelGenerator():
+    """
+    Object responsible of assigning a label (i.e., Background or Browser) to a fingerprint.
+    """
     
     def __init__(self):
         pass
