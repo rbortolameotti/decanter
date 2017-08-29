@@ -40,18 +40,19 @@ class HTTPRequest():
     
 
 class Aggregator:
+    """
+    This class is the engine of Decanter. It is responsible of training and testing fingerprints from input data.
+    """
     
     # Timeout used only in testing mode.
     timeout = datetime.timedelta(minutes=10)
     
-    # File names for dumping fingerprints in CSV format.
-    
+
     def __init__(self, mode=0, offline=0, dump_testing='testing_fingerprints.csv', dump_training='training_fingerprints.csv'):
         # 0 for Training mode - 1 for Testing mode
         if mode != 0 and mode != 1:
             raise ValueError('The mode value is not valid')
         self.hosts_clusters = {}
-        # Thijs - added label generator
         self.label_generator = LabelGenerator()
         self.fin_generator = FingerprintGenerator()
         self.fin_manager = FingerprintManager()
@@ -71,6 +72,7 @@ class Aggregator:
         
         # Referrer graphs per user_agent
         self.referrerGraphs = dict()
+
         
     def change_mode(self, mode):
         if mode != 0 and mode != 1:
@@ -80,6 +82,7 @@ class Aggregator:
             print "Aggregator switched to Testing mode."
         else:
             print "Aggregator switched to Training mode."
+
     
     def analyze_log(self, data):
         """
@@ -127,9 +130,7 @@ class Aggregator:
                 self.hosts_clusters.clear()
                 self.time_start = None
                 
-        # TODO: we should consider also the case where:
-        # - When the log finishes, and the timeout is not triggered, we have to analyze the remaining requests.
-        # RESOLVED: added writing of final fingerprints.
+        # Writing of fingerprints in case the file "ended" and the timeout did not exceed.
         if self.hosts_clusters:
             for host in self.hosts_clusters.keys():
                 for app, http_cluster in self.hosts_clusters[host].iteritems():
