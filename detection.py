@@ -398,19 +398,7 @@ class OfflineDetector:
         self.testing_manager = FingerprintManager()
         self.detector = DetectionModule()
         
-        
-    #def _load_from_csv(self):
-    #    """
-    #    This method loads fingerprints from a .csv file.
-    #    """
-    #    for f in self.files:
-    #        if "training" in f:
-    #            self.training_manager.read_from_file(f)
-    #            print "" + f + " has been loaded for training."
-    #        else:
-    #            self.testing_manager.read_from_file(f)
-    #            print "" + f + " has been loaded for testing."
-                
+
     def _load_from_csv_2(self):
         """
         This method loads fingerprints from a .csv file, but only those flagged for training"
@@ -419,10 +407,8 @@ class OfflineDetector:
             if "training" in f:
                 self.training_manager.read_from_file(f)
                 print "" + f + " has been loaded for training."
-            #else:
-            #    self.testing_manager.read_from_file(f)
-            #    print "" + f + " has been loaded for testing."
-                
+               
+
     def run_detection_2(self):
         """
         This method runs the offline detection.
@@ -462,33 +448,3 @@ class OfflineDetector:
                 self.testing_manager.hosts_fingerprints = dict()
         print """{}/{} files detected.""".format(total_detected, total_files)
         return alerts, benign
-    
-    #def run_detection(self):
-    #    alerts = []
-    #    benign = []
-    #    self._load_from_csv()
-    #    all_training_fingerprints = []
-        
-    #    total_files    = 0
-    #    total_detected = 0
-    #    for h, fingerprints in self.training_manager.hosts_fingerprints.iteritems():
-    #        for f in fingerprints:
-    #            all_training_fingerprints.append(f)
-    #    for host,test_fingerprints in self.testing_manager.hosts_fingerprints.iteritems():
-    #        total_files += 1
-    #        detected = False
-    #        for fingerprint in test_fingerprints:
-    #            if self.detector.detection(all_training_fingerprints, fingerprint):
-    #                if not detected:
-    #                    total_detected += 1
-    #                    detected = True
-    #                alerts.append(fingerprint)
-    #            else:
-    #                benign.append(fingerprint)
-    #        if not detected:
-    #            print host
-    #    
-    #    print """{}/{} files detected.""".format(total_detected, total_files)
-    #       
-    #    return alerts, benign
-
