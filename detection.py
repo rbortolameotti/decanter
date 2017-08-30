@@ -432,6 +432,7 @@ class OfflineDetector:
         for f in self.files:
             if "testing" in f:
                 self.testing_manager.read_from_file(f)
+                print "" + f + " has been loaded for testing."
                 for host,test_fingerprints in self.testing_manager.hosts_fingerprints.iteritems():
                     total_files += 1
                     detected = False
@@ -446,5 +447,6 @@ class OfflineDetector:
                     if not detected:
                         print host
                 self.testing_manager.hosts_fingerprints = dict()
-        print """{}/{} files detected.""".format(total_detected, total_files)
+        # Uncomment if you want to print on how many files at least an alert has been  triggered.
+        #print """{}/{} files detected.""".format(total_detected, total_files)
         return alerts, benign

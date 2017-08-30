@@ -50,8 +50,8 @@ class Aggregator:
 
     def __init__(self, mode=0, offline=0, dump_testing='testing_fingerprints.csv', dump_training='training_fingerprints.csv'):
         # 0 for Training mode - 1 for Testing mode
-        if mode != 0 and mode != 1:
-            raise ValueError('The mode value is not valid')
+        if (mode != 0 and mode != 1) or (offline != 0 and offline != 1):
+            raise ValueError('The mode value is not valid. Choose between 1 or 0.')
         self.hosts_clusters = {}
         self.label_generator = LabelGenerator()
         self.fin_generator = FingerprintGenerator()
@@ -210,9 +210,12 @@ class Aggregator:
                     self.fin_manager.write_fingerprint_to_file(self.dump_testing, new_fingerprint, host)
 
                 else:
-                    host_fingerprints = self.fin_manager.get_host_fingerprints(host)
+                    all_training_fingerprints = []
+                    for h, fingerprints in self.fin_manager.hosts_fingerprints.iteritems():
+                        for f in fingerprints:
+                            all_training_fingerprints.append(f)
 
-                    if self.detector.detection(host_fingerprints, new_fingerprint):
+                    if self.detector.detection(all_training_fingerprints, new_fingerprint):
                         self.alerts.append(new_fingerprint)
         
         else:
