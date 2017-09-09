@@ -28,7 +28,7 @@ Run the following command to generate a bro .log file that is parsable by our im
 ```
 bro -r example.pcap decanter_dump_input.bro
 ```
-The output file called "decanter.log", is the log file parsable by our implementation.
+decanter.log" is the log file parsable by our implementation.
 If you have installed bro by compiling it yourself, you will probably have to change the path of the first two lines of the script accordingly to your installation path.
 
 ### DECANTeR Functionalities
