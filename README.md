@@ -49,7 +49,7 @@ python2 main.py --training test-data/malware/vm7_decanter.log --testing test-dat
 
 Example of Offline analysis:
 ```
-main.py --csv test-data/user/csv/
+python2 main.py --csv test-data/user/csv/
 ```
 
 Example of dumping CSV files and running offline analysis:
