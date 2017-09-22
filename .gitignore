@@ -7,3 +7,9 @@
 
 # Files produced by DECANTeR analysis
 *.csv
+
+#Specifically include sample log and csv data in these subdirectories
+!malware/exiltration_logs/*.log
+!malware/*.log
+!user/csv/*.csv
+!user/log/*.log
