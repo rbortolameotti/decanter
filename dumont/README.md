@@ -26,7 +26,7 @@ The Dumont API provides functionality for detecting anomalies in network traffic
 
 ### Parsing
 The first stap is to prepare data for the Dumont detector. Depending on the input, the dumont library provides functions to parse this data. There are two possible types of input, .pcap files and .log files. The examples below illustrate the usage of the parse pcap and log parse functions respectively:
-```
+```python
 import dumont
 
 data = dumont.parsePCAP('/path/to/file.pcap')
@@ -37,7 +37,7 @@ data = dumont.parseLOG('/path/to/file.log')
 The dumont requests are auxiliary classes which can be used by the detector. They are generated using the parse functions described in the previous subsection. There exist separate classes for being generated through .pcap files and .log files. However, they provide the same functionality through the same API calls. Therefore, this section only discusses the `DumontRequest` class.
 
 #### Attributes
-```
+```python
 # Creating request
 request = DumontRequest(<timestamp>, <req>, <ip>)
 
@@ -68,7 +68,7 @@ request.t4 # Week day of HTTP request
 ```
 
 #### Methods
-```
+```python
 # Creating request
 request = DumontRequest(<timestamp>, <req>, <ip>)
 
@@ -93,7 +93,7 @@ Creating the detector requires two parameters, namely:
 
 The `fp` parameter is used in determining the initial width of the SVM kernel upon training. The `alpha` value is used to set the slope of the calibration function, this function determines the optimal width using the ROC curve of the initial SVM's.
 
-```
+```python
 detector = dumont.detector( fp=0.001,
                             alpha=0.4)
 ```
@@ -101,7 +101,7 @@ detector = dumont.detector( fp=0.001,
 #### Training the detector
 To train the detector, one first needs to fit it with benign data, i.e. data from regular traffic where no anomalies occured. This stage creates SVM's based on each Dumont feature and feature vector. The second step is to calibrate the SVM's using a combination of regular and anomalous data.
 
-```
+```python
 detector.fit(benign_data)
 detector.fit(benign_calibration_data, malicious_calibration_data)
 ```
@@ -109,13 +109,14 @@ detector.fit(benign_calibration_data, malicious_calibration_data)
 #### Predicting
 Once the detector is trained and calibrated, we can use it to predict whether new data is anomalous or regular. For this we feed the detector with a list of previously unseen DumontRequest's and the detector will return a list of booleans for each element in the list. Here False indicates the request on that index is classified as an anomaly and True indicates the request is classified as benign.
 
-```
+```python
 prediction = detector.predict(unseen_data)
 ```
 
 ### Example Usage
 Below we find and example usage where one reads 2 .log files containing data, splits them into fit, calibration and test data and applies this data to the detector which stores alert information in the alerts variable.
-```
+
+```python
 # Import dumont
 import dumont
 
@@ -140,6 +141,8 @@ prediction = detector.predict(malicious_test)
 # Retrieve alerts
 alerts = [alerts[0].alert() for alerts in zip(malicious_test, prediction) if not alerts[1]]
 ```
+
+The [examples](./examples) subdirectory contains data for testing Dumont and an [`example.py`](./examples/example.py) script showing the above code in a minimal working example using actual example data from the [examples/data](./examples/data) subdirectory, outputting all alerts on screen instead of storing them into a variable.
 
 ## Tests
 TODO
