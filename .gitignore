@@ -1,2 +1,9 @@
 *.pyc
 *.class
+
+# Files produced by generating Bro log files
+.state/
+*.log
+
+# Files produced by DECANTeR analysis
+*.csv
