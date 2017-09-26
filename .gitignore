@@ -1,2 +1,15 @@
 *.pyc
 *.class
+
+# Files produced by generating Bro log files
+.state/
+*.log
+
+# Files produced by DECANTeR analysis
+*.csv
+
+#Specifically include sample log and csv data in these subdirectories
+!test-data/malware/exiltration_logs/*.log
+!test-data/malware/*.log
+!test-data/user/csv/*.csv
+!test-data/user/log/*.log

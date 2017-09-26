@@ -9,7 +9,19 @@ Our implementation does not sniff the live traffic from the network. It can only
 These instructions will get you a copy of the project up and running on your local machine for development and testing purposes.
 
 ### Prerequisites
-Before installing the DECANTeR package, make sure the following pyhton packages are installed:
+Ensure you have installed [Python 2.7](https://www.python.org/downloads/) and [Pip](https://pip.pypa.io/en/stable/installing/). Upgrade Pip's package listing:
+
+On Linux or MacOS:
+```
+pip install -U pip
+```
+
+On Windows:
+```
+python -m pip install -U pip
+```
+
+Before installing the DECANTeR package, make sure the following Python packages are installed:
  * [brothon](https://github.com/Kitware/BroThon)
  * [pandas](http://pandas.pydata.org/)
  * [editdistance](https://pypi.python.org/pypi/editdistance)
@@ -28,40 +40,43 @@ Run the following command to generate a bro .log file that is parsable by our im
 ```
 bro -r example.pcap decanter_dump_input.bro
 ```
-decanter.log" is the log file parsable by our implementation.
-If you have installed bro by compiling it yourself, you will probably have to change the path of the first two lines of the script accordingly to your installation path.
+
+The output file _decanter.log_ is the log file parsable by our implementation. This command will always write to the same filename, therefore you must later rename the output file to avoid overwriting existing logs.
+
+**Note:** If you have installed bro by compiling it yourself, you will probably have to change the path of the first two lines of the script accordingly to your installation path.
 
 ### DECANTeR Functionalities
 At the current stage, our implementation provides two type of analysis:
-1. Live analysis: you can provide a training and testing log file, and DECANTeR will analyze the data and print the alerts (if any).
-2. Offline analysis: you can provide a path folder containing a set of .csv files containing the fingerprints (previously dumped by DECANTeR, see below). DECANTeR will use for training all .csv files that have "training" in their filename, and it will use for testing all .csv files having "testing" in their filename.
-3. Dump fingerprints from .log files to .csv: you can provide one file for training and one file for testing, and DECANTeR will generate the fingerprints and dump them to .csv files. This is an intermediary step to run the offline analysis.
+- **Live analysis**: you can provide a training and testing log file, and DECANTeR will analyze the data and print the alerts (if any).
+- **Offline analysis**: you can provide a path folder containing a set of .csv files containing the fingerprints (previously dumped by DECANTeR, see below). DECANTeR will use for training all .csv files that have "training" in their filename, and it will use for testing all .csv files having "testing" in their filename.
+  - Dump fingerprints from .log files to .csv: you can provide one file for training and one file for testing, and DECANTeR will generate the fingerprints and dump them to .csv files. This is an intermediary step to run the offline analysis.
 
 ### Usage Examples
 Examples on how to use DECANTeR to run Live and Offline Analyses, using the test data.
 
-Example of Live analysis:
+#### Example of Live analysis
+
 ```
 python2 main.py --training test-data/user/log/riccardo_linux_training_16-01.log --testing test-data/user/log/riccardo_linux_testing_18-01.log -o 0
 
 python2 main.py --training test-data/malware/vm7_decanter.log --testing test-data/malware/exiltration_logs/URSNIF_386.pcap.decanter.log -o 0
-``` 
+```
 
-Example of Offline analysis:
+#### Example of Offline analysis
 ```
 python2 main.py --csv test-data/user/csv/
 ```
 
-Example of dumping CSV files and running offline analysis:
-1. Dump fingerprints in csv files.
-```
-python2 main.py --training test-data/user/log/riccardo_linux_training_16-01.log --testing test-data/user/log/riccardo_linux_testing_18-01.log -o 1
-```
+#### Example of dumping CSV files and running offline analysis
+  1. Dump fingerprints in csv files.
+  ```
+  python2 main.py --training test-data/user/log/riccardo_linux_training_16-01.log --testing test-data/user/log/riccardo_linux_testing_18-01.log -o 1
+  ```
 
-2. Analyze the fingerprints.
-```
-python2 main.py --csv ./
-```
+  2. Analyze the fingerprints.
+  ```
+  python2 main.py --csv ./
+  ```
 
 ## API Reference
 TODO
