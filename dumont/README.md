@@ -103,7 +103,7 @@ To train the detector, one first needs to fit it with benign data, i.e. data fro
 
 ```python
 detector.fit(benign_data)
-detector.fit(benign_calibration_data, malicious_calibration_data)
+detector.calibrate(benign_calibration_data, malicious_calibration_data)
 ```
 
 #### Predicting
