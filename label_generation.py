@@ -51,7 +51,7 @@ class ReferrerGraph:
             """
         mapping = dict()
         
-        for node in nx.nodes_iter(self.graph):
+        for node in self.graph.nodes():
             mapping[node] = str(node)
             
         g = nx.relabel_nodes(self.graph, mapping)
@@ -68,7 +68,7 @@ class ReferrerGraph:
                 
             """      
         
-        return nx.nodes_iter(self.graph)
+        return self.graph.nodes()
         
     def iter_disconnected_nodes(self):
         """ Method to iterate over disconnected nodes in graph
@@ -82,7 +82,7 @@ class ReferrerGraph:
         
         undirected_graph = self.graph.to_undirected()
 
-        for node in nx.nodes_iter(self.graph):
+        for node in self.graph.nodes():
             c = 0
             for n in nx.all_neighbors(undirected_graph, node):
                 c = 1
@@ -102,7 +102,7 @@ class ReferrerGraph:
         
         undirected_graph = self.graph.to_undirected()
 
-        for node in nx.nodes_iter(self.graph):
+        for node in self.graph.nodes():
             c = 0
             for n in nx.all_neighbors(undirected_graph, node):
                 c = 1
